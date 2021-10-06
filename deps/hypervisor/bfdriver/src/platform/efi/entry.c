@@ -333,11 +333,13 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
 {
     InitializeLib(image, systab);
 
+    BFINFO("%s: common_init()\n", __func__);
     if (common_init() != BF_SUCCESS) {
         return EFI_ABORTED;
     }
 
     g_enable_winpv = 1;
+    BFINFO("%s: parse_cmdline()\n", __func__);
     parse_cmdline(image);
 
 #ifdef USE_XUE
@@ -352,11 +354,16 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
     }
 #endif
 
+    BFINFO("%s: ioctl_add_module()\n", __func__);
     ioctl_add_module((char *)vmm, vmm_len);
+    BFINFO("%s: ioctl_load_vmm()\n", __func__);
     ioctl_load_vmm();
+    BFINFO("%s: ioctl_start_vmm()\n", __func__);
     ioctl_start_vmm();
 
+    BFINFO("%s: unmap_vmm_from_root_domain()\n", __func__);
     unmap_vmm_from_root_domain();
+    BFINFO("%s: load_start_vm()\n", __func__);
     load_start_vm(image);
 
     return EFI_SUCCESS;

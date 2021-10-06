@@ -40,6 +40,7 @@ std::unique_ptr<vcpu> vcpu_factory::make(vcpuid::type vcpuid, bfobject *obj)
         printv("MicroV version %s\n", MICROV_VERSION_FULL);
         microv::domain_info dom0_info{};
         g_dm->create(0, &dom0_info);
+        printv("created dom0\n");
         dom0 = get_domain(0);
     });
 
