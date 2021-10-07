@@ -628,18 +628,24 @@ common_start_vmm(void)
     int64_t cpuid = 0;
     int64_t ignore_ret = 0;
 
+    const int64_t ncpus = platform_num_cpus();
+
     switch (common_vmm_status()) {
         case VMM_CORRUPT:
+            BFINFO("status = VMM_CORRUPT\n");
             return BF_ERROR_VMM_CORRUPTED;
         case VMM_RUNNING:
+            BFINFO("status = VMM_RUNNING\n");
             return BF_SUCCESS;
         case VMM_UNLOADED:
+            BFINFO("status = VMM_UNLOADED\n");
             return BF_ERROR_VMM_INVALID_STATE;
         default:
             break;
     }
 
-    for (cpuid = 0, g_num_cpus_started = 0; cpuid < platform_num_cpus(); cpuid++) {
+    for (cpuid = 0, g_num_cpus_started = 0; cpuid < ncpus; cpuid++) {
+        BFINFO("platform_call_vmm_on_core cpuid=%d, ncpus=%d\n", cpuid, ncpus);
         ret = platform_call_vmm_on_core(
                   (uint64_t)cpuid, BF_REQUEST_VMM_INIT, (uint64_t)cpuid, 0);
 
@@ -654,6 +660,8 @@ common_start_vmm(void)
     return BF_SUCCESS;
 
 failure:
+
+    BFINFO("common_start_vmm failure\n");
 
     ignore_ret = common_stop_vmm();
     bfignored(ignore_ret);
@@ -721,6 +729,13 @@ common_dump_vmm(struct debug_ring_resources_t **drr, uint64_t vcpuid)
 
 typedef struct thread_context_t tc_t;
 
+int64_t getac_test(char *stack, const struct crt_info_t *crt_info) {
+   int64_t x = -20;
+   int64_t y = 42;
+
+   return x+y;
+}
+
 int64_t
 common_call_vmm(
     uint64_t cpuid, uint64_t request, uintptr_t arg1, uintptr_t arg2)
@@ -734,5 +749,6 @@ common_call_vmm(
     tc->cpuid = cpuid;
     tc->tlsptr = (uint64_t *)((uint64_t)g_tls + (THREAD_LOCAL_STORAGE_SIZE * (uint64_t)cpuid));
 
-    return _start_func((void *)(g_stack_top - sizeof(tc_t) - 1), &g_info);
+    //return _start_func((void *)(g_stack_top - sizeof(tc_t) - 1), &g_info);
+    return getac_test((void *)(g_stack_top - sizeof(tc_t) - 1), &g_info);
 }

@@ -30,6 +30,8 @@
 #include <hve/arch/intel_x64/vcpu.h>
 #include <hve/arch/intel_x64/exit_handler.h>
 
+#include <bfdebug.h>
+
 // -----------------------------------------------------------------------------
 // Handlers
 // -----------------------------------------------------------------------------
@@ -80,5 +82,6 @@ handle_exit(
         }
     });
 
+    BFINFO("unhandled vm exit");
     vcpu->halt("unhandled vm exit");
 }

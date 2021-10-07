@@ -78,6 +78,7 @@ domain::domain(id_t domainid, struct domain_info *info) :
 
     if (domainid == 0) {
         this->setup_dom0();
+        printv("dom0 setup\n");
     } else {
         this->setup_domU();
     }
